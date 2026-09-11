@@ -1,0 +1,45 @@
+
+name: Gerar APK ForexRobot
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - principal
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Gradle
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.9-bin.zip
+          unzip -q gradle-8.9-bin.zip
+          echo "$PWD/gradle-8.9/bin" >> $GITHUB_PATH
+
+      - name: Extrair projeto Robo V2
+        run: |
+          rm -rf robo_v2_build
+          mkdir robo_v2_build
+          unzip -q Robo_V2_GitHub.zip -d robo_v2_build
+
+      - name: Compilar APK
+        working-directory: robo_v2_build
+        run: |
+          gradle assembleDebug --stacktrace
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ForexRobot-debug-apk
+          path: robo_v2_build/app/build/outputs/apk/debug/app-debug.apk
