@@ -1,0 +1,23 @@
+workflows:
+  robo-v2-android:
+    name: Robo V2 Android APK
+    max_build_duration: 30
+    environment:
+      java: 17
+    scripts:
+      - name: Extract Robo V2 project
+        script: |
+          rm -rf robo_v2_build
+          mkdir -p robo_v2_build
+          unzip -q Robo_V2_GitHub.zip -d robo_v2_build
+      - name: Create Gradle wrapper
+        script: |
+          cd robo_v2_build
+          gradle wrapper --gradle-version 8.9
+          chmod +x gradlew
+      - name: Build debug APK
+        script: |
+          cd robo_v2_build
+          ./gradlew assembleDebug
+    artifacts:
+      - robo_v2_build/app/build/outputs/apk/debug/app-debug.apk
